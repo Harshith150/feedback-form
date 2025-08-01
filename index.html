@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Form - Enhanced Data Collection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="feedback-card" id="feedbackCard">
+            <div class="header">
+                <h1>How was your experience?</h1>
+                <p>We'd love to hear your feedback!</p>
+            </div>
+           
+            <div class="feedback-options">
+                <button class="feedback-btn bad" data-rating="bad">
+                    <span class="emoji">😞</span>
+                    <span class="text">Bad</span>
+                </button>
+               
+                <button class="feedback-btn okay" data-rating="okay">
+                    <span class="emoji">😐</span>
+                    <span class="text">Okay</span>
+                </button>
+               
+                <button class="feedback-btn good" data-rating="good">
+                    <span class="emoji">😊</span>
+                    <span class="text">Good</span>
+                </button>
+               
+                <button class="feedback-btn amazing" data-rating="amazing">
+                    <span class="emoji">🤩</span>
+                    <span class="text">Amazing</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Bad Feedback Response -->
+        <div class="response-card hidden" id="badResponse">
+            <div class="funny-animation">
+                <div class="crying-emoji">😭</div>
+                <div class="gif-container">
+                    <div class="gif-loading" id="gifLoading">
+                        <div class="loading-spinner">🔄</div>
+                        <p>Loading tears of our dev team...</p>
+                    </div>
+                    <img src="https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif"
+                         alt="Developer crying and having breakdown"
+                         class="funny-gif"
+                         id="mainGif"
+                         onload="gifLoaded()"
+                         onerror="loadFallbackGif()"
+                         style="display: none;">
+                </div>
+                <div class="shake-text">
+                    <h2>Our Team is crying in corner,hope they will be okay😢</h2>
+                </div>
+            </div>
+           
+            <div class="action-buttons">
+                <button class="joke-btn" onclick="showJoke()">
+                    <span>😂</span> Thanks for coping with us , here are some jokes to satisfy you
+                </button>
+            </div>
+        </div>
+
+        <!-- Positive Feedback Response -->
+        <div class="response-card hidden" id="positiveResponse">
+            <div class="success-animation">
+                <div class="celebration">🎉</div>
+                <h2 id="thankYouMessage">Thank you for your feedback!</h2>
+                <p id="responseMessage"></p>
+            </div>
+            <button class="home-btn" onclick="goHome()">
+                <span>🏠</span> Back to Home
+            </button>
+        </div>
+
+        <!-- Joke Modal -->
+        <div class="modal hidden" id="jokeModal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeJoke()">&times;</span>
+                <div class="joke-container">
+                    <h3>Here's a joke to cheer you up! 😄</h3>
+                    <p id="jokeText"></p>
+                    <div class="joke-buttons">
+                        <button class="another-joke-btn" onclick="showJoke()">Another One!</button>
+                        <button class="close-joke-btn" onclick="closeJoke()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
