@@ -3,11 +3,676 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback Form - Enhanced Data Collection</title>
+    <title>Feedback Form</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern Beautiful Feedback Form Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 100px 100px, 150px 150px, 200px 200px;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback-card, .response-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px 30px;
+            box-shadow:
+                0 25px 50px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+
+        .feedback-card:hover::before {
+            left: 100%;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+            animation: underlineGrow 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes underlineGrow {
+            from { width: 0; }
+            to { width: 80px; }
+        }
+
+        .header p {
+            color: #7f8c8d;
+            margin-bottom: 35px;
+            font-size: 1.2rem;
+            font-weight: 400;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+                .feedback-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin: 0;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: inherit;
+            min-height: 140px;
+            position: relative;
+            overflow: hidden;
+            /* Touch-friendly enhancements */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .feedback-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, transparent, rgba(255, 255, 255, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .feedback-btn:hover::before {
+            opacity: 1;
+        }
+
+        .feedback-btn:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.15),
+                0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-btn .emoji {
+            font-size: 3rem;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .feedback-btn .text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-btn.good:hover {
+            border-color: #27ae60;
+            background: linear-gradient(145deg, #f8fff9, #e8f5e8);
+        }
+
+        .feedback-btn.nice:hover {
+            border-color: #3498db;
+            background: linear-gradient(145deg, #f8fcff, #e3f2fd);
+        }
+
+        .feedback-btn.cool:hover {
+            border-color: #9b59b6;
+            background: linear-gradient(145deg, #fdf8ff, #f3e5f5);
+        }
+
+        .feedback-btn.awesome:hover {
+            border-color: #f39c12;
+            background: linear-gradient(145deg, #fffcf7, #fff3e0);
+        }
+
+        .feedback-btn:hover .emoji {
+            transform: scale(1.3) rotate(10deg);
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1.3) rotate(10deg); }
+            50% { transform: scale(1.4) rotate(15deg); }
+        }
+
+        .feedback-btn:hover .text {
+            color: #1a252f;
+            transform: scale(1.05);
+        }
+
+        /* Response Cards */
+        .response-card {
+            animation: slideInScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideInScale {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-animation {
+            margin-bottom: 30px;
+        }
+
+        .celebration {
+            font-size: 5rem;
+            animation: celebrate 2s ease infinite;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        @keyframes celebrate {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+            25% {
+                transform: scale(1.15) rotate(-8deg);
+            }
+            50% {
+                transform: scale(1.2) rotate(0deg);
+            }
+            75% {
+                transform: scale(1.15) rotate(8deg);
+            }
+        }
+
+        .success-animation h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .success-animation p {
+            color: #555;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .home-btn, .celebration-btn, .another-celebration-btn, .close-celebration-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .home-btn::before, .celebration-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .home-btn:hover::before, .celebration-btn:hover::before {
+            left: 100%;
+        }
+
+        .home-btn:hover, .celebration-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .celebration-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);
+        }
+
+        .celebration-btn:hover {
+            box-shadow: 0 15px 35px rgba(243, 156, 18, 0.4);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 25px;
+            padding: 40px 30px;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.7) translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #bbb;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #333;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .celebration-container h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .celebration-container p {
+            color: #555;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .celebration-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Click Animation */
+        .feedback-btn:active {
+            transform: scale(0.95);
+        }
+
+        .home-btn:active, .celebration-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Enhanced Responsive Design for All Devices */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+           
+            .feedback-card {
+                padding: 25px 20px;
+                margin: 10px;
+            }
+           
+            .header h1 {
+                font-size: 2.2rem;
+                margin-bottom: 15px;
+            }
+           
+            .header p {
+                font-size: 1rem;
+            }
+           
+            .feedback-options {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin: 25px 0;
+            }
+           
+            .feedback-btn {
+                padding: 18px 12px;
+                min-height: 120px;
+            }
+           
+            .feedback-btn .emoji {
+                font-size: 2.8rem;
+                margin-bottom: 8px;
+            }
+           
+            .feedback-btn span:last-child {
+                font-size: 0.9rem;
+            }
+           
+            .action-buttons {
+                gap: 12px;
+                margin-top: 20px;
+            }
+           
+            .home-btn, .celebration-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+       
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+           
+            .feedback-card {
+                padding: 20px 15px;
+                margin: 5px;
+                border-radius: 20px;
+            }
+           
+            .feedback-options {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin: 20px 0;
+            }
+           
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 10px;
+            }
+           
+            .header p {
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }
+           
+            .feedback-btn {
+                padding: 20px 15px;
+                min-height: 100px;
+            }
+           
+            .feedback-btn .emoji {
+                font-size: 2.5rem;
+                margin-bottom: 8px;
+            }
+           
+            .feedback-btn span:last-child {
+                font-size: 0.85rem;
+                font-weight: 600;
+            }
+           
+            .celebration {
+                font-size: 4rem;
+            }
+           
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+                margin-top: 15px;
+            }
+           
+            .home-btn, .celebration-btn {
+                width: 100%;
+                max-width: 250px;
+                padding: 15px 20px;
+                font-size: 15px;
+            }
+           
+            .response-card {
+                padding: 25px 15px;
+                margin: 5px;
+            }
+           
+            .celebration-modal .celebration-container {
+                padding: 20px 15px;
+                margin: 10px;
+                max-width: calc(100% - 20px);
+            }
+           
+            .celebration-modal h2 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+           
+            .celebration-modal .close-btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+       
+        @media (max-width: 360px) {
+            .feedback-card {
+                padding: 15px 10px;
+            }
+           
+            .header h1 {
+                font-size: 1.6rem;
+            }
+           
+            .feedback-btn {
+                padding: 15px 10px;
+                min-height: 90px;
+            }
+           
+            .feedback-btn .emoji {
+                font-size: 2.2rem;
+            }
+           
+            .feedback-btn span:last-child {
+                font-size: 0.8rem;
+            }
+           
+            .home-btn, .celebration-btn {
+                padding: 12px 16px;
+                font-size: 14px;
+                max-width: 220px;
+            }
+        }
+       
+        @media (max-width: 320px) {
+            .feedback-card {
+                padding: 12px 8px;
+            }
+           
+            .header h1 {
+                font-size: 1.4rem;
+            }
+           
+            .header p {
+                font-size: 0.8rem;
+            }
+           
+            .feedback-btn {
+                padding: 12px 8px;
+                min-height: 80px;
+            }
+           
+            .feedback-btn .emoji {
+                font-size: 2rem;
+            }
+           
+            .feedback-btn span:last-child {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -18,79 +683,88 @@
             </div>
            
             <div class="feedback-options">
-                <button class="feedback-btn bad" data-rating="bad">
-                    <span class="emoji">😞</span>
-                    <span class="text">Bad</span>
-                </button>
-               
-                <button class="feedback-btn okay" data-rating="okay">
-                    <span class="emoji">😐</span>
-                    <span class="text">Okay</span>
-                </button>
-               
                 <button class="feedback-btn good" data-rating="good">
-                    <span class="emoji">😊</span>
+                    <span class="emoji">👍</span>
                     <span class="text">Good</span>
                 </button>
                
-                <button class="feedback-btn amazing" data-rating="amazing">
-                    <span class="emoji">🤩</span>
-                    <span class="text">Amazing</span>
+                <button class="feedback-btn nice" data-rating="nice">
+                    <span class="emoji">🙂</span>
+                    <span class="text">Nice</span>
+                </button>
+               
+                <button class="feedback-btn cool" data-rating="cool">
+                    <span class="emoji">😎</span>
+                    <span class="text">Cool</span>
+                </button>
+               
+                <button class="feedback-btn awesome" data-rating="awesome">
+                    <span class="emoji">🔥</span>
+                    <span class="text">Awesome</span>
                 </button>
             </div>
         </div>
 
-        <!-- Bad Feedback Response -->
-        <div class="response-card hidden" id="badResponse">
-            <div class="funny-animation">
-                <div class="crying-emoji">😭</div>
-                <div class="gif-container">
-                    <div class="gif-loading" id="gifLoading">
-                        <div class="loading-spinner">🔄</div>
-                        <p>Loading tears of our dev team...</p>
-                    </div>
-                    <img src="https://media.giphy.com/media/9Y5BbDSkSTiY8/giphy.gif"
-                         alt="Developer crying and having breakdown"
-                         class="funny-gif"
-                         id="mainGif"
-                         onload="gifLoaded()"
-                         onerror="loadFallbackGif()"
-                         style="display: none;">
-                </div>
-                <div class="shake-text">
-                    <h2>Our Team is crying in corner,hope they will be okay😢</h2>
-                </div>
-            </div>
-           
-            <div class="action-buttons">
-                <button class="joke-btn" onclick="showJoke()">
-                    <span>😂</span> Thanks for coping with us , here are some jokes to satisfy you
-                </button>
-            </div>
-        </div>
-
-        <!-- Positive Feedback Response -->
-        <div class="response-card hidden" id="positiveResponse">
+        <!-- Response Cards -->
+        <div class="response-card hidden" id="goodResponse">
             <div class="success-animation">
-                <div class="celebration">🎉</div>
-                <h2 id="thankYouMessage">Thank you for your feedback!</h2>
-                <p id="responseMessage"></p>
+                <div class="celebration">👍</div>
+                <h2>That's what we like to hear! 🎉</h2>
+                <p>You're making our day brighter! Keep being awesome! ✨</p>
             </div>
             <button class="home-btn" onclick="goHome()">
                 <span>🏠</span> Back to Home
             </button>
         </div>
 
-        <!-- Joke Modal -->
-        <div class="modal hidden" id="jokeModal">
+        <div class="response-card hidden" id="niceResponse">
+            <div class="success-animation">
+                <div class="celebration">🙂</div>
+                <h2>Nice! That's the spirit! 🌟</h2>
+                <p>Your positivity is contagious! We're smiling from ear to ear! 😄</p>
+            </div>
+            <button class="home-btn" onclick="goHome()">
+                <span>🏠</span> Back to Home
+            </button>
+        </div>
+
+        <div class="response-card hidden" id="coolResponse">
+            <div class="success-animation">
+                <div class="celebration">😎</div>
+                <h2>Cool beans! You're absolutely right! 🚀</h2>
+                <p>We're feeling pretty cool ourselves now! Thanks for the good vibes! 🎸</p>
+            </div>
+            <button class="home-btn" onclick="goHome()">
+                <span>🏠</span> Back to Home
+            </button>
+        </div>
+
+        <div class="response-card hidden" id="awesomeResponse">
+            <div class="success-animation">
+                <div class="celebration">🔥</div>
+                <h2>AWESOME! You're absolutely incredible! 🎊</h2>
+                <p>We're doing happy dances over here! You've made our entire team's day! 💃🕺</p>
+            </div>
+            <div class="action-buttons">
+                <button class="celebration-btn" onclick="createConfettiEffect()">
+                    <span>�</span> Confetti!
+                </button>
+                <button class="home-btn" onclick="goHome()">
+                    <span>🏠</span> Back to Home
+                </button>
+            </div>
+        </div>
+
+        <!-- Celebration Modal -->
+        <div class="modal hidden" id="celebrationModal">
             <div class="modal-content">
-                <span class="close-btn" onclick="closeJoke()">&times;</span>
-                <div class="joke-container">
-                    <h3>Here's a joke to cheer you up! 😄</h3>
-                    <p id="jokeText"></p>
-                    <div class="joke-buttons">
-                        <button class="another-joke-btn" onclick="showJoke()">Another One!</button>
-                        <button class="close-joke-btn" onclick="closeJoke()">Close</button>
+                <span class="close-btn" onclick="closeCelebration()">&times;</span>
+                <div class="celebration-container">
+                    <h3>🎊 PARTY TIME! 🎊</h3>
+                    <p id="celebrationText">🎉 You've unlocked our secret celebration mode! 🎉</p>
+                    <div class="celebration-buttons">
+                        <button class="another-celebration-btn" onclick="showCelebration()">🎊 More Confetti!</button>
+                        <button class="close-celebration-btn" onclick="closeCelebration()">✨ Close</button>
                     </div>
                 </div>
             </div>
@@ -98,5 +772,284 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Very funny celebration messages
+        const celebrationMessages = [
+            "🤪 You just broke our 'awesome' meter! Now it only shows EPIC! 🤪",
+            "🚀 NASA called... they want to study your awesomeness! 🚀",
+            "� Breaking: Local person too awesome for regular feedback! 🎪",
+            "🤖 ERROR 404: Normal feedback not found. AWESOME overload detected! 🤖",
+            "� Plot twist: You're the main character in the story of awesomeness! �",
+            "� Achievement unlocked: Master of Making Developers Happy! �",
+            "� Fun fact: You're more satisfying than a perfect taco! �",
+            "🦄 Unicorns are jealous of how magical you are! 🦄",
+            "� Your feedback just became our new theme song! �",
+            "� You're the pineapple on pizza of feedback - controversial but loved! �"
+        ];
+
+        // Fast-loading HUMOROUS celebration GIFs - FUNNY & OPTIMIZED!
+        const celebrationGifs = [
+            "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",  // Dancing baby - internet legend
+            "https://media.giphy.com/media/ZdlpVuyoZJfvW/giphy.gif",      // Deal with it - iconic humor
+            "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif", // Minion excited - funny reaction
+            "https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"      // SpongeBob nice - cartoon humor
+        ];
+
+        // Single HUMOROUS & FUNNY GIF for each feedback type - OPTIMIZED FOR SPEED & LAUGHS!
+        const responseGifs = {
+            good: [
+                "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnVmbGt5N3g0MGtnc2I0dm5zaHI5c2F5ZjJoam1pcXViZHJ6dGc4ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/d3MKq5hNWnq5mCKA/giphy.gif"  // Dancing baby - HILARIOUS classic internet meme
+            ],
+            nice: [
+                "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeW44dnR4bGF6ZXV2c2p0ZWtrdDB1Y2ZnZmQxbHN4YzhlcjZqczl2ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/NEvPzZ8bd1V4Y/giphy.gif"     // SpongeBob "nice" - funny cartoon classic
+            ],
+            cool: [
+                "./gif1.gif"      // Deal with it sunglasses - ICONIC internet humor
+            ],
+            awesome: [
+                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWQ1ZnBzbGw4Ync1aWUwYmg5cjdmMTZmNjY4d2FtcTF2Y2FpaDY2NiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/blSTtZehjAZ8I/giphy.gif" // Minion super excited - funny & over-the-top
+            ]
+        };
+
+        // Simple feedback handler to ensure buttons work
+        function handleFeedback(rating) {
+            console.log('handleFeedback called with rating:', rating);
+           
+            // Hide the feedback card
+            const feedbackCard = document.getElementById('feedbackCard');
+            console.log('feedbackCard element:', feedbackCard);
+            if (feedbackCard) {
+                feedbackCard.classList.add('hidden');
+            }
+           
+            // Show the appropriate response card
+            const responseCard = document.getElementById(rating + 'Response');
+            console.log('Looking for response card with ID:', rating + 'Response');
+            console.log('responseCard element:', responseCard);
+           
+            if (responseCard) {
+                responseCard.classList.remove('hidden');
+                console.log('Showing response card for:', rating);
+               
+                // Add a fun GIF to the response
+                addGifToResponse(responseCard, rating);
+            } else {
+                console.error('Response card not found for rating:', rating);
+            }
+           
+            // Send feedback to server
+            fetch('/api/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: rating,
+                    timestamp: new Date().toISOString(),
+                    dateString: new Date().toLocaleString()
+                })
+            }).catch(error => {
+                console.log('Server not available, but feedback UI still works');
+            });
+        }
+       
+        function addGifToResponse(responseCard, rating) {
+            // Check if GIF already exists
+            let gifContainer = responseCard.querySelector('.gif-container');
+            if (!gifContainer) {
+                // Create GIF container
+                gifContainer = document.createElement('div');
+                gifContainer.className = 'gif-container';
+                gifContainer.style.cssText = `
+                    margin: 20px 0;
+                    text-align: center;
+                `;
+               
+                // Create GIF element
+                const gif = document.createElement('img');
+                gif.className = 'response-gif';
+                gif.style.cssText = `
+                    max-width: 300px;
+                    width: 100%;
+                    height: auto;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                    border: 3px solid #667eea;
+                    margin: 10px 0;
+                `;
+               
+                // Get random GIF for this rating
+                const gifs = responseGifs[rating] || responseGifs.awesome;
+                const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
+                gif.src = randomGif;
+               
+                // Better fallback with working GIF URLs
+                gif.onerror = function() {
+                    // Try popular fallback GIFs that definitely work
+                    const fallbackGifs = [
+                        'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWJjZGVmZ2hpams/26u4cqiYI30juCOGY/giphy.gif',
+                        'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWJjZGVmZ2hpams/3o7abKhOpu0NwenH3O/giphy.gif',
+                        'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWJjZGVmZ2hpams/l0MYt5jPR6QX5pnqM/giphy.gif'
+                    ];
+                    const fallback = fallbackGifs[Math.floor(Math.random() * fallbackGifs.length)];
+                    this.src = fallback;
+                   
+                    // If that also fails, show a fun emoji instead
+                    this.onerror = function() {
+                        this.style.display = 'none';
+                        const emojiDiv = document.createElement('div');
+                        emojiDiv.style.cssText = `
+                            font-size: 60px;
+                            margin: 20px 0;
+                            animation: bounce 1s infinite;
+                        `;
+                        emojiDiv.textContent = ['🎉', '🎊', '✨', '🌟', '🎁', '🎪'][Math.floor(Math.random() * 6)];
+                        this.parentNode.appendChild(emojiDiv);
+                    };
+                };
+               
+                gifContainer.appendChild(gif);
+               
+                // Insert after success-animation div
+                const successDiv = responseCard.querySelector('.success-animation');
+                if (successDiv) {
+                    successDiv.appendChild(gifContainer);
+                }
+            }
+        }
+       
+        function goHome() {
+            // Hide all response cards
+            document.querySelectorAll('.response-card').forEach(card => {
+                card.classList.add('hidden');
+            });
+            // Show feedback card
+            document.getElementById('feedbackCard').classList.remove('hidden');
+        }
+       
+        function showCelebration() {
+            // Just show confetti without messages or jokes
+            createConfettiEffect();
+           
+            // Optionally show the modal without text if you want
+            const modal = document.getElementById('celebrationModal');
+           
+            // Update modal to just show "Confetti!" without jokes
+            const textElement = document.getElementById('celebrationText');
+            if (textElement) {
+                textElement.textContent = "🎊 Confetti! 🎊";
+            }
+           
+            // Show modal briefly
+            modal.classList.remove('hidden');
+           
+            // Auto-close modal after 2 seconds
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 2000);
+        }
+       
+        function createConfettiEffect() {
+            // Pure confetti effect without messages - just beautiful confetti!
+           
+            // Add animation styles for confetti
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes confettiFall {
+                    to {
+                        top: ${window.innerHeight + 20}px;
+                        transform: rotate(720deg) scale(0.5);
+                        opacity: 0;
+                    }
+                }
+                @keyframes confettiSpin {
+                    to {
+                        transform: rotate(360deg) translateY(${window.innerHeight + 20}px);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+           
+            // Create MEGA confetti explosion - 100 pieces!
+            const confettiShapes = ['●', '■', '▲', '★', '♦', '♥', '♠', '♣'];
+            const confettiColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#ff9ff3', '#54a0ff'];
+           
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    const shape = confettiShapes[Math.floor(Math.random() * confettiShapes.length)];
+                    const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                    const size = Math.random() * 15 + 8; // 8-23px
+                    const startX = Math.random() * window.innerWidth;
+                    const drift = (Math.random() - 0.5) * 200; // Left/right drift
+                   
+                    confetti.textContent = shape;
+                    confetti.style.cssText = `
+                        position: fixed;
+                        top: -30px;
+                        left: ${startX}px;
+                        font-size: ${size}px;
+                        color: ${color};
+                        pointer-events: none;
+                        z-index: 10000;
+                        user-select: none;
+                        text-shadow: 0 0 6px rgba(0,0,0,0.3);
+                        animation: ${Math.random() > 0.5 ? 'confettiFall' : 'confettiSpin'} ${3 + Math.random() * 2}s linear forwards;
+                        transform: translateX(${drift}px);
+                    `;
+                   
+                    document.body.appendChild(confetti);
+                   
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        if (document.body.contains(confetti)) {
+                            document.body.removeChild(confetti);
+                        }
+                    }, 5000);
+                }, i * 50); // Stagger the confetti creation
+            }
+           
+            // Add screen shake effect for extra fun
+            document.body.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                document.body.style.animation = '';
+            }, 500);
+           
+            // Add shake animation
+            const shakeStyle = document.createElement('style');
+            shakeStyle.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-2px); }
+                    75% { transform: translateX(2px); }
+                }
+            `;
+            document.head.appendChild(shakeStyle);
+        }
+       
+        function closeCelebration() {
+            document.getElementById('celebrationModal').classList.add('hidden');
+        }
+       
+        // Add click listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up event listeners');
+           
+            // Add click handlers to feedback buttons
+            const feedbackButtons = document.querySelectorAll('.feedback-btn');
+            console.log('Found feedback buttons:', feedbackButtons.length);
+           
+            feedbackButtons.forEach((button, index) => {
+                const rating = button.getAttribute('data-rating');
+                console.log(`Button ${index + 1}: rating = ${rating}`);
+               
+                button.addEventListener('click', function() {
+                    console.log('Button clicked! Rating:', rating);
+                    handleFeedback(rating);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

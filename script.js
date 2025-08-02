@@ -1,158 +1,528 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const url = require('url');
-
-// MIME types for different file extensions
-const mimeTypes = {
-    '.html': 'text/html',
-    '.js': 'text/javascript',
-    '.css': 'text/css',
-    '.json': 'application/json',
-    '.png': 'image/png',
-    '.jpg': 'image/jpg',
-    '.gif': 'image/gif',
-    '.ico': 'image/x-icon',
-    '.svg': 'image/svg+xml'
+// Enhanced feedback script with positive vibes and funny responses
+const responses = {
+    good: {
+        title: "That's what we like to hear! 🎉",
+        message: "You're making our day brighter! Keep being awesome! ✨",
+        gifs: [
+            "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif",
+            "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
+            "https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif"
+        ]
+    },
+    nice: {
+        title: "Nice! That's the spirit! 🌟",
+        message: "Your positivity is contagious! We're smiling from ear to ear! 😄",
+        gifs: [
+            "https://media.giphy.com/media/3o7abspvhYHpMnHSuc/giphy.gif",
+            "https://media.giphy.com/media/26u4lOMA8JKSnL9Uk/giphy.gif",
+            "https://media.giphy.com/media/l0MYGb8Q5QBhBSaEE/giphy.gif"
+        ]
+    },
+    cool: {
+        title: "Cool beans! You're absolutely right! �",
+        message: "We're feeling pretty cool ourselves now! Thanks for the good vibes! �",
+        gifs: [
+            "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+            "https://media.giphy.com/media/3o7abAHdYvZdBNnGZq/giphy.gif",
+            "https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif"
+        ]
+    },
+    awesome: {
+        title: "AWESOME! You're absolutely incredible! 🎊",
+        message: "We're doing happy dances over here! You've made our entire team's day! �🕺",
+        gifs: [
+            "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
+            "https://media.giphy.com/media/26u4b45b8KlgAB7iM/giphy.gif",
+            "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"
+        ]
+    }
 };
 
-// In-memory storage for feedback data (for demonstration)
-let feedbackData = [];
+// Funny celebration messages for awesome ratings
+const celebrationMessages = [
+    "🎉 You've unlocked our secret celebration mode! 🎉",
+    "� Houston, we have AWESOMENESS! 🚀",
+    "🎊 Breaking news: You're officially amazing! �",
+    "✨ Our happiness meter just broke from overload! ✨",
+    "🌟 You deserve a standing ovation! *clap clap clap* 🌟",
+    "🎈 We're throwing a virtual party in your honor! 🎈",
+    "🏆 Champion of Awesomeness award goes to... YOU! 🏆",
+    "💫 You've made our developer team do happy coding dances! �"
+];
 
-const server = http.createServer((req, res) => {
-    const parsedUrl = url.parse(req.url, true);
-    const pathname = parsedUrl.pathname;
+// Celebration GIFs for the awesome response
+const celebrationGifs = [
+    "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+    "https://media.giphy.com/media/26u4b45b8KlgAB7iM/giphy.gif",
+    "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
+    "https://media.giphy.com/media/26tknCqiJrBQG6bxC/giphy.gif",
+    "https://media.giphy.com/media/3o7abrH8o4HMgEAV9e/giphy.gif"
+];
+
+// Configuration for data collection methods
+const DATA_COLLECTION_CONFIG = {
+    // Method 1: EmailJS (Free email service)
+    emailjs: {
+        enabled: true,
+        serviceId: 'YOUR_EMAILJS_SERVICE_ID', // Replace with your EmailJS service ID
+        templateId: 'YOUR_EMAILJS_TEMPLATE_ID', // Replace with your EmailJS template ID
+        publicKey: 'YOUR_EMAILJS_PUBLIC_KEY' // Replace with your EmailJS public key
+    },
    
-    // Enable CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // Method 2: Google Sheets (via Google Apps Script)
+    googleSheets: {
+        enabled: false, // Set to true to enable
+        scriptUrl: 'YOUR_GOOGLE_APPS_SCRIPT_URL' // Replace with your Google Apps Script URL
+    },
    
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        res.writeHead(200);
-        res.end();
-        return;
+    // Method 3: Webhook URL (any service that accepts POST requests)
+    webhook: {
+        enabled: false, // Set to true to enable
+        url: 'YOUR_WEBHOOK_URL' // Replace with your webhook URL
+    },
+   
+    // Method 4: Local storage backup (always enabled as fallback)
+    localStorage: {
+        enabled: true
     }
-   
-    // API endpoints
-    if (pathname === '/api/feedback' && req.method === 'POST') {
-        // Handle feedback submission
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
+};
+
+// Data Collection Manager
+class FeedbackDataManager {
+    constructor() {
+        this.initializeEmailJS();
+    }
+
+    // Initialize EmailJS if enabled
+    initializeEmailJS() {
+        if (DATA_COLLECTION_CONFIG.emailjs.enabled) {
+            // Load EmailJS library
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+            script.onload = () => {
+                emailjs.init(DATA_COLLECTION_CONFIG.emailjs.publicKey);
+                console.log('EmailJS initialized');
+            };
+            document.head.appendChild(script);
+        }
+    }
+
+    // Send feedback data to all enabled services
+    async sendFeedback(feedbackData) {
+        const results = [];
        
-        req.on('end', () => {
+        // Always save to localStorage as backup
+        this.saveToLocalStorage(feedbackData);
+        results.push({ method: 'localStorage', success: true });
+
+        // Try EmailJS
+        if (DATA_COLLECTION_CONFIG.emailjs.enabled) {
             try {
-                const feedback = JSON.parse(body);
-               
-                // Add server timestamp and ID
-                feedback.serverId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                feedback.serverTimestamp = new Date().toISOString();
-               
-                feedbackData.push(feedback);
-               
-                console.log('📝 New feedback received:', feedback.rating, 'at', new Date().toLocaleString());
-               
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({
-                    success: true,
-                    message: 'Feedback saved successfully',
-                    id: feedback.serverId
-                }));
+                await this.sendToEmailJS(feedbackData);
+                results.push({ method: 'emailjs', success: true });
             } catch (error) {
-                console.error('Error processing feedback:', error);
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ success: false, error: 'Invalid JSON' }));
+                console.error('EmailJS failed:', error);
+                results.push({ method: 'emailjs', success: false, error });
             }
+        }
+
+        // Try Google Sheets
+        if (DATA_COLLECTION_CONFIG.googleSheets.enabled) {
+            try {
+                await this.sendToGoogleSheets(feedbackData);
+                results.push({ method: 'googleSheets', success: true });
+            } catch (error) {
+                console.error('Google Sheets failed:', error);
+                results.push({ method: 'googleSheets', success: false, error });
+            }
+        }
+
+        // Try Webhook
+        if (DATA_COLLECTION_CONFIG.webhook.enabled) {
+            try {
+                await this.sendToWebhook(feedbackData);
+                results.push({ method: 'webhook', success: true });
+            } catch (error) {
+                console.error('Webhook failed:', error);
+                results.push({ method: 'webhook', success: false, error });
+            }
+        }
+
+        return results;
+    }
+
+    // Send via EmailJS
+    async sendToEmailJS(feedbackData) {
+        const templateParams = {
+            rating: feedbackData.rating,
+            timestamp: feedbackData.timestamp,
+            user_agent: feedbackData.userAgent,
+            page_url: feedbackData.pageUrl,
+            message: `New feedback received: ${feedbackData.rating} rating`
+        };
+
+        return emailjs.send(
+            DATA_COLLECTION_CONFIG.emailjs.serviceId,
+            DATA_COLLECTION_CONFIG.emailjs.templateId,
+            templateParams
+        );
+    }
+
+    // Send to Google Sheets
+    async sendToGoogleSheets(feedbackData) {
+        const response = await fetch(DATA_COLLECTION_CONFIG.googleSheets.scriptUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(feedbackData)
         });
-        return;
+
+        if (!response.ok) {
+            throw new Error(`Google Sheets API error: ${response.status}`);
+        }
+
+        return response.json();
     }
-   
-    if (pathname === '/api/feedback' && req.method === 'GET') {
-        // Return all feedback data
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(feedbackData));
-        return;
+
+    // Send to Webhook
+    async sendToWebhook(feedbackData) {
+        const response = await fetch(DATA_COLLECTION_CONFIG.webhook.url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(feedbackData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Webhook error: ${response.status}`);
+        }
+
+        return response.json();
     }
-   
-    if (pathname === '/api/feedback/stats' && req.method === 'GET') {
-        // Return feedback statistics
+
+    // Save to localStorage (fallback method)
+    saveToLocalStorage(feedbackData) {
+        try {
+            let existingData = JSON.parse(localStorage.getItem('feedbackData') || '[]');
+            existingData.push(feedbackData);
+            localStorage.setItem('feedbackData', JSON.stringify(existingData));
+            return true;
+        } catch (error) {
+            console.error('LocalStorage save failed:', error);
+            return false;
+        }
+    }
+}
+
+// Initialize data manager
+const dataManager = new FeedbackDataManager();
+
+// Enhanced feedback storage with server integration
+const FeedbackStorage = {
+    save: async function(rating) {
+        const feedbackData = {
+            rating: rating,
+            timestamp: new Date().toISOString(),
+            dateString: new Date().toLocaleString(),
+            userAgent: navigator.userAgent,
+            pageUrl: window.location.href,
+            sessionId: this.getSessionId()
+        };
+
+        try {
+            // Try to send to server first
+            const serverResponse = await this.sendToServer(feedbackData);
+            if (serverResponse.success) {
+                console.log('✅ Feedback sent to server successfully');
+            }
+        } catch (error) {
+            console.warn('⚠️ Server unavailable, saving locally:', error.message);
+        }
+
+        // Always save to localStorage as backup
+        this.saveToLocalStorage(feedbackData);
+       
+        // Also send using existing data manager for external services
+        try {
+            await dataManager.sendFeedback(feedbackData);
+        } catch (error) {
+            console.warn('External services unavailable:', error);
+        }
+
+        return { success: true, data: feedbackData };
+    },
+
+    sendToServer: async function(feedbackData) {
+        const response = await fetch('/api/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(feedbackData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        return response.json();
+    },
+
+    saveToLocalStorage: function(feedbackData) {
+        try {
+            let existingData = JSON.parse(localStorage.getItem('feedbackResponses') || '[]');
+            existingData.push(feedbackData);
+            localStorage.setItem('feedbackResponses', JSON.stringify(existingData));
+            return true;
+        } catch (error) {
+            console.error('LocalStorage save failed:', error);
+            return false;
+        }
+    },
+
+    getSessionId: function() {
+        let sessionId = sessionStorage.getItem('feedbackSessionId');
+        if (!sessionId) {
+            sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('feedbackSessionId', sessionId);
+        }
+        return sessionId;
+    },
+
+    getAllFromServer: async function() {
+        try {
+            const response = await fetch('/api/feedback');
+            if (response.ok) {
+                return await response.json();
+            }
+        } catch (error) {
+            console.warn('Could not fetch from server, using local data');
+        }
+        return this.getAllFromLocal();
+    },
+
+    getAllFromLocal: function() {
+        return JSON.parse(localStorage.getItem('feedbackResponses') || '[]');
+    },
+
+    getStatsFromServer: async function() {
+        try {
+            const response = await fetch('/api/feedback/stats');
+            if (response.ok) {
+                return await response.json();
+            }
+        } catch (error) {
+            console.warn('Could not fetch stats from server, calculating from local data');
+        }
+        return this.calculateLocalStats();
+    },
+
+    calculateLocalStats: function() {
+        const data = this.getAllFromLocal();
         const stats = {
-            total: feedbackData.length,
-            bad: feedbackData.filter(f => f.rating === 'bad').length,
-            okay: feedbackData.filter(f => f.rating === 'okay').length,
-            good: feedbackData.filter(f => f.rating === 'good').length,
-            amazing: feedbackData.filter(f => f.rating === 'amazing').length
+            total: data.length,
+            bad: data.filter(f => f.rating === 'bad').length,
+            okay: data.filter(f => f.rating === 'okay').length,
+            good: data.filter(f => f.rating === 'good').length,
+            amazing: data.filter(f => f.rating === 'amazing').length
         };
        
-        stats.satisfaction = feedbackData.length > 0 ?
-            Math.round(((stats.good + stats.amazing) / feedbackData.length) * 100) : 0;
+        stats.satisfaction = data.length > 0 ?
+            Math.round(((stats.good + stats.amazing) / data.length) * 100) : 0;
            
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(stats));
-        return;
-    }
-   
-    if (pathname === '/api/feedback/clear' && req.method === 'DELETE') {
-        // Clear all feedback data
-        feedbackData = [];
-        console.log('🗑️ All feedback data cleared');
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, message: 'All data cleared' }));
-        return;
-    }
-   
-    // Serve static files
-    let filePath = pathname === '/' ? './index.html' : '.' + pathname;
-   
-    // Security check - prevent directory traversal
-    filePath = path.resolve(filePath);
-    const rootDir = path.resolve('./');
-    if (!filePath.startsWith(rootDir)) {
-        res.writeHead(403);
-        res.end('Forbidden');
-        return;
-    }
-   
-    const extname = path.extname(filePath).toLowerCase();
-    const contentType = mimeTypes[extname] || 'application/octet-stream';
-   
-    fs.readFile(filePath, (error, content) => {
-        if (error) {
-            if (error.code === 'ENOENT') {
-                res.writeHead(404);
-                res.end('File not found');
-            } else {
-                res.writeHead(500);
-                res.end('Server error: ' + error.code);
+        return stats;
+    },
+
+    clearAllData: async function() {
+        try {
+            const response = await fetch('/api/feedback/clear', { method: 'DELETE' });
+            if (response.ok) {
+                console.log('✅ Server data cleared');
             }
-        } else {
-            res.writeHead(200, { 'Content-Type': contentType });
-            res.end(content, 'utf-8');
+        } catch (error) {
+            console.warn('Could not clear server data:', error);
         }
+       
+        // Also clear local storage
+        localStorage.removeItem('feedbackResponses');
+        localStorage.removeItem('feedbackData');
+        console.log('✅ Local data cleared');
+    },
+
+    exportToCSV: async function() {
+        const data = await this.getAllFromServer();
+        if (data.length === 0) {
+            alert('No feedback data to export!');
+            return;
+        }
+
+        const csvContent = [
+            ['Rating', 'Date & Time', 'Session ID', 'User Agent', 'Page URL', 'Server ID'],
+            ...data.map(item => [
+                item.rating,
+                item.dateString || item.timestamp,
+                item.sessionId,
+                item.userAgent || '',
+                item.pageUrl || '',
+                item.serverId || ''
+            ])
+        ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `feedback-data-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+};
+
+// GIF loading functions
+function gifLoaded(gifId) {
+    const gif = document.getElementById(gifId);
+    if (gif) {
+        gif.style.display = 'block';
+    }
+}
+
+function loadFallbackGif(gifId, rating) {
+    const fallbackGifs = responses[rating]?.gifs || [
+        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+        'https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif',
+        'https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif'
+    ];
+   
+    const randomGif = fallbackGifs[Math.floor(Math.random() * fallbackGifs.length)];
+    const gif = document.getElementById(gifId);
+   
+    if (gif) {
+        gif.src = randomGif;
+        gif.onload = () => gifLoaded(gifId);
+        gif.onerror = function() {
+            // If all else fails, hide the gif
+            gif.style.display = 'none';
+        };
+    }
+}
+
+// Event listeners for feedback buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const feedbackButtons = document.querySelectorAll('.feedback-btn');
+   
+    feedbackButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            const rating = this.getAttribute('data-rating');
+           
+            // Add loading state
+            this.innerHTML = '<span class="loading-spinner">🔄</span><span class="text">Sending...</span>';
+            this.disabled = true;
+           
+            try {
+                // Save feedback data
+                await FeedbackStorage.save(rating);
+               
+                // Hide feedback card
+                document.getElementById('feedbackCard').classList.add('hidden');
+               
+                // Show appropriate response
+                handleFeedbackResponse(rating);
+               
+            } catch (error) {
+                console.error('Error saving feedback:', error);
+                // Still show response even if data sending failed
+                document.getElementById('feedbackCard').classList.add('hidden');
+                handleFeedbackResponse(rating);
+            }
+        });
     });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
-    console.log('🚀 Server running on port ' + PORT);
-    console.log('📊 Feedback Form: /');
-    console.log('📈 Admin Dashboard: /admin.html');
-    console.log('🔧 API Endpoints:');
-    console.log('   - POST /api/feedback (submit feedback)');
-    console.log('   - GET /api/feedback (get all feedback)');
-    console.log('   - GET /api/feedback/stats (get statistics)');
-    console.log('   - DELETE /api/feedback/clear (clear all data)');
-    console.log('\n💡 Environment: ' + (process.env.NODE_ENV || 'development'));
-});
+function handleFeedbackResponse(rating) {
+    const response = responses[rating];
+    const responseCard = document.getElementById(rating + 'Response');
+   
+    if (responseCard && response) {
+        // Update message and gif
+        const messageElement = responseCard.querySelector('h2');
+        const gif = responseCard.querySelector('.funny-gif');
+       
+        if (messageElement) {
+            messageElement.textContent = response.title;
+        }
+       
+        // Set a random gif for this rating
+        if (gif && response.gifs) {
+            const randomGif = response.gifs[Math.floor(Math.random() * response.gifs.length)];
+            gif.src = randomGif;
+        }
+       
+        // Show the response card
+        responseCard.classList.remove('hidden');
+       
+        // Add some extra fun for awesome ratings
+        if (rating === 'awesome') {
+            setTimeout(() => {
+                // Add some confetti effect or extra animation
+                responseCard.classList.add('extra-celebration');
+            }, 500);
+        }
+    }
+}
 
-// Graceful shutdown
-process.on('SIGINT', () => {
-    console.log('\n🛑 Server shutting down...');
-    server.close(() => {
-        console.log('✅ Server stopped successfully');
-        process.exit(0);
+function showCelebration() {
+    const randomMessage = celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)];
+    const randomGif = celebrationGifs[Math.floor(Math.random() * celebrationGifs.length)];
+   
+    document.getElementById('celebrationText').textContent = randomMessage;
+    document.getElementById('celebrationGif').src = randomGif;
+    document.getElementById('celebrationModal').classList.remove('hidden');
+}
+
+function closeCelebration() {
+    document.getElementById('celebrationModal').classList.add('hidden');
+}
+
+function goHome() {
+    // Reset all cards
+    document.querySelectorAll('.response-card').forEach(card => {
+        card.classList.add('hidden');
+        card.classList.remove('extra-celebration');
     });
-});
+    document.getElementById('feedbackCard').classList.remove('hidden');
+   
+    // Reset buttons
+    document.querySelectorAll('.feedback-btn').forEach(button => {
+        button.disabled = false;
+        const rating = button.getAttribute('data-rating');
+        const emoji = button.querySelector('.emoji').textContent;
+        const text = rating.charAt(0).toUpperCase() + rating.slice(1);
+        button.innerHTML = `<span class="emoji">${emoji}</span><span class="text">${text}</span>`;
+    });
+}
+
+// Add export functionality to admin
+window.exportFeedbackData = function() {
+    FeedbackStorage.exportToCSV();
+};
+
+// Console commands for debugging
+console.log(`
+🎯 Feedback Form Enhanced Data Collection
+========================================
+
+Available console commands:
+- FeedbackStorage.getAll() : Get all feedback data
+- FeedbackStorage.exportToCSV() : Export data as CSV
+- exportFeedbackData() : Export data as CSV
+
+Configuration methods available:
+1. EmailJS (email notifications)
+2. Google Sheets (spreadsheet storage)  
+3. Webhook (custom endpoint)
+4. LocalStorage (always enabled as backup)
+
+To configure data collection, edit the DATA_COLLECTION_CONFIG object in this file.
+`);
