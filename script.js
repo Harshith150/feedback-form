@@ -22,7 +22,6 @@ const responses = {
         title: "Cool beans! You're absolutely right! 🚀",
         message: "We're feeling pretty cool ourselves now! Thanks for the good vibes! 🎸",
         gifs: [
-            "https://media.giphy.com/media/ZdlpVuyoZJfvW/giphy.gif",
             "https://media.giphy.com/media/3o7abAHdYvZdBNnGZq/giphy.gif",
             "https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif"
         ]
