@@ -1,4 +1,4 @@
-// Enhanced feedback script with positive vibes and funny responses
+// Enhanced feedback script with positive vibes and funny responses - CROSS-PLATFORM OPTIMIZED
 const responses = {
     good: {
         title: "That's what we like to hear! 🎉",
@@ -13,25 +13,25 @@ const responses = {
         title: "Nice! That's the spirit! 🌟",
         message: "Your positivity is contagious! We're smiling from ear to ear! 😄",
         gifs: [
-            "https://media.giphy.com/media/3o7abspvhYHpMnHSuc/giphy.gif",
+            "https://media.giphy.com/media/111ebonMs90YLu/giphy.gif",
             "https://media.giphy.com/media/26u4lOMA8JKSnL9Uk/giphy.gif",
             "https://media.giphy.com/media/l0MYGb8Q5QBhBSaEE/giphy.gif"
         ]
     },
     cool: {
-        title: "Cool beans! You're absolutely right! �",
-        message: "We're feeling pretty cool ourselves now! Thanks for the good vibes! �",
+        title: "Cool beans! You're absolutely right! 🚀",
+        message: "We're feeling pretty cool ourselves now! Thanks for the good vibes! 🎸",
         gifs: [
-            "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+            "https://media.giphy.com/media/ZdlpVuyoZJfvW/giphy.gif",
             "https://media.giphy.com/media/3o7abAHdYvZdBNnGZq/giphy.gif",
             "https://media.giphy.com/media/l0MYC0LajbaPoEADu/giphy.gif"
         ]
     },
     awesome: {
         title: "AWESOME! You're absolutely incredible! 🎊",
-        message: "We're doing happy dances over here! You've made our entire team's day! �🕺",
+        message: "We're doing happy dances over here! You've made our entire team's day! 💃🕺",
         gifs: [
-            "https://media.giphy.com/media/3o7abB06u9bNzA8lu8/giphy.gif",
+            "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
             "https://media.giphy.com/media/26u4b45b8KlgAB7iM/giphy.gif",
             "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"
         ]
@@ -408,34 +408,52 @@ function loadFallbackGif(gifId, rating) {
     }
 }
 
-// Event listeners for feedback buttons
+// Event listeners for feedback buttons - INSTANT RESPONSE (NO LOADING STATE)
 document.addEventListener('DOMContentLoaded', function() {
     const feedbackButtons = document.querySelectorAll('.feedback-btn');
    
     feedbackButtons.forEach(button => {
-        button.addEventListener('click', async function() {
+        // Use both click and touchend events for better mobile/Mac support
+        const handleFeedbackClick = async function(event) {
+            event.preventDefault(); // Prevent default behavior
+            event.stopPropagation(); // Stop event bubbling
+           
             const rating = this.getAttribute('data-rating');
            
-            // Add loading state
-            this.innerHTML = '<span class="loading-spinner">🔄</span><span class="text">Sending...</span>';
+            // Prevent double-clicks
+            if (this.disabled) {
+                return;
+            }
+           
+            // Disable button immediately to prevent double-clicks
             this.disabled = true;
            
             try {
-                // Save feedback data
-                await FeedbackStorage.save(rating);
+                // Save feedback data in background (async, doesn't block UI)
+                FeedbackStorage.save(rating).catch(error => {
+                    console.warn('Background save failed:', error);
+                });
                
-                // Hide feedback card
+                // Hide feedback card immediately
                 document.getElementById('feedbackCard').classList.add('hidden');
                
-                // Show appropriate response
+                // Show appropriate response immediately
                 handleFeedbackResponse(rating);
                
             } catch (error) {
-                console.error('Error saving feedback:', error);
-                // Still show response even if data sending failed
+                console.error('Error processing feedback:', error);
+                // Still show response even if error occurs
                 document.getElementById('feedbackCard').classList.add('hidden');
                 handleFeedbackResponse(rating);
             }
+        };
+       
+        // Add both click and touch event listeners for better cross-platform support
+        button.addEventListener('click', handleFeedbackClick);
+        button.addEventListener('touchend', function(event) {
+            // Prevent both touchend and click from firing
+            event.preventDefault();
+            handleFeedbackClick.call(this, event);
         });
     });
 });
@@ -445,19 +463,14 @@ function handleFeedbackResponse(rating) {
     const responseCard = document.getElementById(rating + 'Response');
    
     if (responseCard && response) {
-        // Update message and gif
+        // Update message
         const messageElement = responseCard.querySelector('h2');
-        const gif = responseCard.querySelector('.funny-gif');
-       
         if (messageElement) {
             messageElement.textContent = response.title;
         }
        
-        // Set a random gif for this rating
-        if (gif && response.gifs) {
-            const randomGif = response.gifs[Math.floor(Math.random() * response.gifs.length)];
-            gif.src = randomGif;
-        }
+        // ADD GIF TO RESPONSE CARD - IMPROVED FOR MAC COMPATIBILITY
+        addGifToResponseCard(responseCard, rating);
        
         // Show the response card
         responseCard.classList.remove('hidden');
@@ -468,6 +481,108 @@ function handleFeedbackResponse(rating) {
                 // Add some confetti effect or extra animation
                 responseCard.classList.add('extra-celebration');
             }, 500);
+        }
+    }
+}
+
+// NEW FUNCTION TO ADD GIFS WITH BETTER MAC COMPATIBILITY
+function addGifToResponseCard(responseCard, rating) {
+    // Check if GIF already exists
+    let gifContainer = responseCard.querySelector('.gif-container');
+    if (!gifContainer) {
+        // Create GIF container
+        gifContainer = document.createElement('div');
+        gifContainer.className = 'gif-container';
+        gifContainer.style.cssText = `
+            margin: 20px 0;
+            text-align: center;
+        `;
+       
+        // Create GIF element
+        const gif = document.createElement('img');
+        gif.className = 'response-gif';
+        gif.style.cssText = `
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 3px solid #667eea;
+            margin: 10px 0;
+            opacity: 0.5;
+        `;
+       
+        // Get GIFs for this rating with Mac-friendly URLs
+        const macFriendlyGifs = {
+            good: [
+                "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif",
+                "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif"
+            ],
+            nice: [
+                "https://media.giphy.com/media/111ebonMs90YLu/giphy.gif",
+                "https://media.giphy.com/media/3o7abspvhYHpMnHSuc/giphy.gif"
+            ],
+            cool: [
+                "https://media.giphy.com/media/ZdlpVuyoZJfvW/giphy.gif",
+                "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
+            ],
+            awesome: [
+                "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
+                "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"
+            ]
+        };
+       
+        const gifs = macFriendlyGifs[rating] || macFriendlyGifs.awesome;
+        const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
+        gif.src = randomGif;
+       
+        console.log(`Loading GIF for ${rating}: ${randomGif}`);
+       
+        // Enhanced error handling for Mac
+        gif.onload = function() {
+            console.log(`✅ GIF loaded successfully for ${rating}`);
+            this.style.opacity = '1';
+        };
+       
+        gif.onerror = function() {
+            console.log(`❌ Primary GIF failed for ${rating}, trying fallback...`);
+            // Try universal fallback GIFs that work on all platforms
+            const universalFallbacks = [
+                "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif",
+                "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
+                "https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"
+            ];
+            const fallback = universalFallbacks[Math.floor(Math.random() * universalFallbacks.length)];
+            this.src = fallback;
+           
+            // If even fallbacks fail, show emoji
+            this.onerror = function() {
+                console.log(`❌ All GIFs failed for ${rating}, showing emoji fallback`);
+                this.style.display = 'none';
+                const emojiDiv = document.createElement('div');
+                emojiDiv.style.cssText = `
+                    font-size: 60px;
+                    margin: 20px 0;
+                    animation: bounce 1s infinite;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                `;
+                const emojiMap = {
+                    good: '👍',
+                    nice: '🙂',
+                    cool: '😎',
+                    awesome: '🔥'
+                };
+                emojiDiv.textContent = emojiMap[rating] || '🎉';
+                this.parentNode.appendChild(emojiDiv);
+            };
+        };
+       
+        gifContainer.appendChild(gif);
+       
+        // Insert after success-animation div
+        const successDiv = responseCard.querySelector('.success-animation');
+        if (successDiv) {
+            successDiv.appendChild(gifContainer);
         }
     }
 }
@@ -485,6 +600,86 @@ function closeCelebration() {
     document.getElementById('celebrationModal').classList.add('hidden');
 }
 
+// ADD MISSING CONFETTI FUNCTION
+function createConfettiEffect() {
+    console.log('🎊 Creating confetti effect...');
+   
+    // Add animation styles for confetti
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes confettiFall {
+            to {
+                top: ${window.innerHeight + 20}px;
+                transform: rotate(720deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+        @keyframes confettiSpin {
+            to {
+                transform: rotate(360deg) translateY(${window.innerHeight + 20}px);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+   
+    // Create MEGA confetti explosion - 100 pieces!
+    const confettiShapes = ['●', '■', '▲', '★', '♦', '♥', '♠', '♣'];
+    const confettiColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#ff9ff3', '#54a0ff'];
+   
+    for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            const shape = confettiShapes[Math.floor(Math.random() * confettiShapes.length)];
+            const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+            const size = Math.random() * 15 + 8; // 8-23px
+            const startX = Math.random() * window.innerWidth;
+            const drift = (Math.random() - 0.5) * 200; // Left/right drift
+           
+            confetti.textContent = shape;
+            confetti.style.cssText = `
+                position: fixed;
+                top: -30px;
+                left: ${startX}px;
+                font-size: ${size}px;
+                color: ${color};
+                pointer-events: none;
+                z-index: 10000;
+                user-select: none;
+                text-shadow: 0 0 6px rgba(0,0,0,0.3);
+                animation: ${Math.random() > 0.5 ? 'confettiFall' : 'confettiSpin'} ${3 + Math.random() * 2}s linear forwards;
+                transform: translateX(${drift}px);
+            `;
+           
+            document.body.appendChild(confetti);
+           
+            // Remove confetti after animation
+            setTimeout(() => {
+                if (document.body.contains(confetti)) {
+                    document.body.removeChild(confetti);
+                }
+            }, 5000);
+        }, i * 50); // Stagger the confetti creation
+    }
+   
+    // Add screen shake effect for extra fun
+    document.body.style.animation = 'shake 0.5s ease-in-out';
+    setTimeout(() => {
+        document.body.style.animation = '';
+    }, 500);
+   
+    // Add shake animation
+    const shakeStyle = document.createElement('style');
+    shakeStyle.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+    `;
+    document.head.appendChild(shakeStyle);
+}
+
 function goHome() {
     // Reset all cards
     document.querySelectorAll('.response-card').forEach(card => {
@@ -493,14 +688,26 @@ function goHome() {
     });
     document.getElementById('feedbackCard').classList.remove('hidden');
    
-    // Reset buttons
+    // Reset buttons - SIMPLE RESET (no loading states to worry about)
     document.querySelectorAll('.feedback-btn').forEach(button => {
         button.disabled = false;
+       
         const rating = button.getAttribute('data-rating');
-        const emoji = button.querySelector('.emoji').textContent;
+        const emoji = button.querySelector('.emoji')?.textContent || getEmojiForRating(rating);
         const text = rating.charAt(0).toUpperCase() + rating.slice(1);
         button.innerHTML = `<span class="emoji">${emoji}</span><span class="text">${text}</span>`;
     });
+}
+
+// Helper function to get emoji for rating
+function getEmojiForRating(rating) {
+    const emojiMap = {
+        good: '👍',
+        nice: '🙂',
+        cool: '😎',
+        awesome: '🔥'
+    };
+    return emojiMap[rating] || '👍';
 }
 
 // Add export functionality to admin
@@ -517,6 +724,8 @@ Available console commands:
 - FeedbackStorage.getAll() : Get all feedback data
 - FeedbackStorage.exportToCSV() : Export data as CSV
 - exportFeedbackData() : Export data as CSV
+- testConfetti() : Test confetti effect
+- testGifs() : Test GIF loading
 
 Configuration methods available:
 1. EmailJS (email notifications)
@@ -526,3 +735,71 @@ Configuration methods available:
 
 To configure data collection, edit the DATA_COLLECTION_CONFIG object in this file.
 `);
+
+// DEBUG FUNCTIONS FOR TESTING
+window.testConfetti = function() {
+    console.log('🧪 Testing confetti...');
+    try {
+        createConfettiEffect();
+        console.log('✅ Confetti test completed');
+    } catch (error) {
+        console.error('❌ Confetti test failed:', error);
+    }
+};
+
+window.testGifs = function() {
+    console.log('🧪 Testing GIF loading...');
+    const testContainer = document.createElement('div');
+    testContainer.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 10000;
+        text-align: center;
+    `;
+   
+    const testGifs = [
+        "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif",
+        "https://media.giphy.com/media/111ebonMs90YLu/giphy.gif",
+        "https://media.giphy.com/media/ZdlpVuyoZJfvW/giphy.gif",
+        "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif"
+    ];
+   
+    testContainer.innerHTML = `
+        <h3>GIF Test</h3>
+        <p>Testing GIF loading on your Mac...</p>
+        <button onclick="this.parentElement.remove()">Close</button>
+        <br><br>
+    `;
+   
+    testGifs.forEach((gifUrl, index) => {
+        const img = document.createElement('img');
+        img.src = gifUrl;
+        img.style.cssText = `
+            width: 100px;
+            height: 80px;
+            margin: 5px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        `;
+        img.onload = () => {
+            console.log(`✅ GIF ${index + 1} loaded successfully`);
+            img.style.borderColor = '#4CAF50';
+        };
+        img.onerror = () => {
+            console.log(`❌ GIF ${index + 1} failed to load`);
+            img.style.borderColor = '#f44336';
+            img.alt = 'Failed';
+        };
+        testContainer.appendChild(img);
+    });
+   
+    document.body.appendChild(testContainer);
+};
+
+

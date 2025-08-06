@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feedback Form</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -205,6 +205,34 @@
             box-shadow:
                 0 20px 40px rgba(0, 0, 0, 0.15),
                 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+       
+        /* Loading state for feedback buttons */
+        .feedback-btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+       
+        .feedback-btn.loading::after {
+            content: "Sending...";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #667eea;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+            border-radius: inherit;
+        }
+       
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
 
         .feedback-btn .emoji {
@@ -795,34 +823,40 @@
             "https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"      // SpongeBob nice - cartoon humor
         ];
 
-        // Single HUMOROUS & FUNNY GIF for each feedback type - OPTIMIZED FOR SPEED & LAUGHS!
+        // Single HUMOROUS & FUNNY GIF for each feedback type - CROSS-PLATFORM OPTIMIZED!
         const responseGifs = {
             good: [
-                "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnVmbGt5N3g0MGtnc2I0dm5zaHI5c2F5ZjJoam1pcXViZHJ6dGc4ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/d3MKq5hNWnq5mCKA/giphy.gif"  // Dancing baby - HILARIOUS classic internet meme
+                "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif"  // Dancing baby - HILARIOUS classic internet meme
             ],
             nice: [
-                "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeW44dnR4bGF6ZXV2c2p0ZWtrdDB1Y2ZnZmQxbHN4YzhlcjZqczl2ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/NEvPzZ8bd1V4Y/giphy.gif"     // SpongeBob "nice" - funny cartoon classic
+                "https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"     // SpongeBob "nice" - funny cartoon classic
             ],
             cool: [
-                "./gif1.gif"      // Deal with it sunglasses - ICONIC internet humor
+                "https://media.giphy.com/media/ZdlpVuyoZJfvW/giphy.gif"      // Deal with it sunglasses - ICONIC internet humor
             ],
             awesome: [
-                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWQ1ZnBzbGw4Ync1aWUwYmg5cjdmMTZmNjY4d2FtcTF2Y2FpaDY2NiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/blSTtZehjAZ8I/giphy.gif" // Minion super excited - funny & over-the-top
+                "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif" // Minion super excited - funny & over-the-top
             ]
         };
 
-        // Simple feedback handler to ensure buttons work
+        // Enhanced feedback handler - INSTANT RESPONSE (NO LOADING STATE)
         function handleFeedback(rating) {
             console.log('handleFeedback called with rating:', rating);
            
-            // Hide the feedback card
+            // Prevent double-clicks by disabling all buttons immediately
+            const allButtons = document.querySelectorAll('.feedback-btn');
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+            });
+           
+            // Hide the feedback card immediately
             const feedbackCard = document.getElementById('feedbackCard');
             console.log('feedbackCard element:', feedbackCard);
             if (feedbackCard) {
                 feedbackCard.classList.add('hidden');
             }
            
-            // Show the appropriate response card
+            // Show the appropriate response card immediately
             const responseCard = document.getElementById(rating + 'Response');
             console.log('Looking for response card with ID:', rating + 'Response');
             console.log('responseCard element:', responseCard);
@@ -837,7 +871,7 @@
                 console.error('Response card not found for rating:', rating);
             }
            
-            // Send feedback to server
+            // Send feedback to server in background (async, doesn't block UI)
             fetch('/api/feedback', {
                 method: 'POST',
                 headers: {
@@ -883,31 +917,42 @@
                 const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
                 gif.src = randomGif;
                
-                // Better fallback with working GIF URLs
+                // Cross-platform improved fallback with better error handling
                 gif.onerror = function() {
-                    // Try popular fallback GIFs that definitely work
+                    console.log('Primary GIF failed, trying fallback...');
+                    // Try popular fallback GIFs that work on all platforms
                     const fallbackGifs = [
-                        'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWJjZGVmZ2hpams/26u4cqiYI30juCOGY/giphy.gif',
-                        'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWJjZGVmZ2hpams/3o7abKhOpu0NwenH3O/giphy.gif',
-                        'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWJjZGVmZ2hpams/l0MYt5jPR6QX5pnqM/giphy.gif'
+                        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+                        'https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif',
+                        'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+                        'https://media.giphy.com/media/111ebonMs90YLu/giphy.gif'
                     ];
                     const fallback = fallbackGifs[Math.floor(Math.random() * fallbackGifs.length)];
                     this.src = fallback;
                    
                     // If that also fails, show a fun emoji instead
                     this.onerror = function() {
+                        console.log('All GIFs failed, showing emoji fallback');
                         this.style.display = 'none';
                         const emojiDiv = document.createElement('div');
                         emojiDiv.style.cssText = `
                             font-size: 60px;
                             margin: 20px 0;
                             animation: bounce 1s infinite;
+                            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
                         `;
                         emojiDiv.textContent = ['🎉', '🎊', '✨', '🌟', '🎁', '🎪'][Math.floor(Math.random() * 6)];
                         this.parentNode.appendChild(emojiDiv);
                     };
                 };
                
+                // Add loading indication
+                gif.onload = function() {
+                    console.log('GIF loaded successfully for rating:', rating);
+                    this.style.opacity = '1';
+                };
+               
+                gif.style.opacity = '0.5'; // Show loading state
                 gifContainer.appendChild(gif);
                
                 // Insert after success-animation div
@@ -919,12 +964,29 @@
         }
        
         function goHome() {
+            console.log('🏠 goHome() called - starting reset process');
+           
             // Hide all response cards
             document.querySelectorAll('.response-card').forEach(card => {
                 card.classList.add('hidden');
             });
+           
+            // Reset all feedback buttons - SIMPLE RESET (no loading states)
+            const allButtons = document.querySelectorAll('.feedback-btn');
+            console.log('Found', allButtons.length, 'feedback buttons to reset');
+           
+            allButtons.forEach((btn, index) => {
+                console.log(`Resetting button ${index + 1}:`, btn.getAttribute('data-rating'));
+               
+                // Simple reset - just enable the button
+                btn.disabled = false;
+            });
+           
             // Show feedback card
-            document.getElementById('feedbackCard').classList.remove('hidden');
+            const feedbackCard = document.getElementById('feedbackCard');
+            feedbackCard.classList.remove('hidden');
+           
+            console.log('✅ Reset complete - buttons are ready for new clicks');
         }
        
         function showCelebration() {
@@ -1050,6 +1112,35 @@
                 });
             });
         });
+       
+        // Debug function to test button states - call this from browser console
+        window.debugButtons = function() {
+            console.log('🔍 DEBUG: Checking all button states...');
+            const buttons = document.querySelectorAll('.feedback-btn');
+            buttons.forEach((btn, i) => {
+                const rating = btn.getAttribute('data-rating');
+                const hasLoading = btn.classList.contains('loading');
+                const styles = window.getComputedStyle(btn);
+                const afterContent = window.getComputedStyle(btn, '::after').content;
+               
+                console.log(`Button ${i + 1} (${rating}):`, {
+                    hasLoadingClass: hasLoading,
+                    pointerEvents: btn.style.pointerEvents,
+                    opacity: btn.style.opacity,
+                    computedOpacity: styles.opacity,
+                    afterContent: afterContent,
+                    classList: [...btn.classList]
+                });
+            });
+        };
+       
+        // Auto-debug on page load
+        setTimeout(() => {
+            console.log('🚀 Page loaded! You can run debugButtons() in console to check button states');
+            window.debugButtons();
+        }, 1000);
     </script>
 </body>
 </html>
+
+
