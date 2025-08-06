@@ -4,9 +4,7 @@ const responses = {
         title: "That's what we like to hear! 🎉",
         message: "You're making our day brighter! Keep being awesome! ✨",
         gifs: [
-            "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif",
-            "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif",
-            "https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif"
+            "https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif"
         ]
     },
     nice: {
